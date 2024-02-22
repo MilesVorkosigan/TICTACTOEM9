@@ -1,3 +1,4 @@
+
 package m9tictactoe;
 
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.net.UnknownHostException;
 import java.util.Random;
 import java.util.Scanner;
 
+
 public class M9TicTacToe {
 
     /**
@@ -16,7 +18,7 @@ public class M9TicTacToe {
      */
     public static void main(String[] args) throws UnknownHostException, SocketException, IOException {
                 Scanner teclat = new Scanner(System.in);
-		InetAddress serverAddress = InetAddress.getByName("127.0.0.1");
+		            InetAddress serverAddress = InetAddress.getByName("127.0.0.1");
 		int serverPort = 7879;
 		
                 Random random = new Random();
@@ -44,5 +46,6 @@ public class M9TicTacToe {
 			System.out.print("MSG[enter per finalitzar]: ");
 			msg = teclat.nextLine();
         }
+
     }
 }
