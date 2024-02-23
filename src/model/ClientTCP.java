@@ -12,24 +12,52 @@ import java.util.logging.Logger;
  *
  * @author MilesMarxant
  */
-public class ClientTCP {
+public class ClientTCP implements Runnable {
 
-    public static void main(String[] args) {
+    private Socket sock;
+    private DataInputStream in;
+    private DataOutputStream out;
+    private String name;
+    private int port;
+
+    @Override
+
+    public void run() {
+
 
         try {
-            Scanner sc = new Scanner(System.in);
-            sc.useDelimiter("\n");
-            Socket sock  = new Socket("localhost", 8888);
-            DataInputStream in = new DataInputStream(sock.getInputStream());
-            DataOutputStream out = new DataOutputStream(sock.getOutputStream());
+            Scanner scanner = new Scanner(System.in);
+           
+            scanner.useDelimiter("\n");
+            int jugada =15;
+            System.out.println("Si us plau escriu el teu nom");
+            name=scanner.nextLine();
+            // el port ens ho donarà el UDP
+            port =8888;
+            Socket sc  = new Socket("127.0.0.1", port);
+            DataInputStream in = new DataInputStream(sc.getInputStream());
+            DataOutputStream out = new DataOutputStream(sc.getOutputStream());
             String msg = in.readUTF();
             System.out.println(msg);
-            ClientFil fil= new ClientFil(in,out);
-            String nomClient  =sc.next();
-            out.writeUTF(nomClient);
-            fil.start();
-            fil.join();
-        } catch (IOException | InterruptedException ex) {
+            
+            
+            out.writeUTF(name);
+            System.out.println(in.readUTF());
+            
+            while (true) {
+                
+                System.out.println("linea"+jugada);
+                 break;
+           
+                
+             }
+            sc.close();
+          
+        } catch (IOException ex) {
+            System.out.println("""
+                               No es pot establir una connexió.
+                               Assegura't que el servidor estigui en execució
+                               i que el port sigui accessible.""");
             Logger.getLogger(ClientTCP.class.getName()).log(Level.SEVERE, null, ex);
         }
 
