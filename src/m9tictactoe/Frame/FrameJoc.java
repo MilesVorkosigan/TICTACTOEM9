@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.Random;
 import m9tictactoe.Jugador;
 
-public class TicTacToe extends JPanel implements ActionListener {
+public class FrameJoc extends JPanel implements ActionListener {
     
     Random random = new Random();
     JFrame frame = new JFrame();
@@ -23,7 +23,7 @@ public class TicTacToe extends JPanel implements ActionListener {
 
     
     
-    public TicTacToe() {
+    public FrameJoc() {
         //iniciar jugador
         iniciarJugador();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

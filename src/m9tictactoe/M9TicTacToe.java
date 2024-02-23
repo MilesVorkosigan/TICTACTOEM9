@@ -1,6 +1,3 @@
-
-
-
 package m9tictactoe;
 
 import java.io.IOException;
@@ -11,17 +8,19 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Random;
 import java.util.Scanner;
-
-
+import m9tictactoe.Frame.FrameJoc;
 
 public class M9TicTacToe {
+private final boolean INICIAR_PARTIDA=true;
+private final boolean TORN_JUGADOR=true;
+private final boolean TORN_CONTRARI = false;
+private final boolean SEGON_TORN=false;
 
     /**
      * @param args the command line arguments
      */
-
     public static void main(String[] args) throws UnknownHostException, SocketException, IOException {
-       boolean jogar = true;
+        boolean jogar = true;
         System.out.println("Bon dia Selecciona el que vols fer");
         System.out.println("""
                            1- Connectar-se a una partida
@@ -31,10 +30,18 @@ public class M9TicTacToe {
         while (jogar) {
             if (sc.hasNextInt()) {
                 switch (sc.nextInt()) {
-                    case 1 -> crearServidorTCP();
-                    case 2 -> crearClientTCP();
-                    case 3 -> jogar = false;
-                    default -> System.out.println("Error, Has de seleccionar 1,2,3 opcions");
+                    case 1 -> {
+                        
+                      
+                        crearServidorTCP();
+
+                    }
+                    case 2 ->
+                        crearClientTCP();
+                    case 3 ->
+                        jogar = false;
+                    default ->
+                        System.out.println("Error, Has de seleccionar 1,2,3 opcions");
                 }
 
             } else {
@@ -44,44 +51,42 @@ public class M9TicTacToe {
         }
         //UDP Clie
         InetAddress serverAddress = InetAddress.getByName("127.0.0.1");
-		int serverPort = 7879;
-		
-                Random random = new Random();
-                int clientPort = random.nextInt(5535) + 1024;
-                
-		DatagramSocket socket = new DatagramSocket(clientPort);
-		
-		System.out.print("MSG[enter per finalitzar]: ");
-		String msg = sc.nextLine();
-		while(!msg.isEmpty()) {
-			//enviar missatge a servidor
-			byte[] bytesOUT = msg.getBytes();
-			DatagramPacket outPacket = new DatagramPacket(bytesOUT, bytesOUT.length, serverAddress, serverPort);
-			socket.send(outPacket);
-                        System.out.println(socket.getPort());
-                        
-			
-			//rebre echo del servidor
-			byte[] buffer = new byte[1024];
-			DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-			socket.receive(packet);
-			System.out.println(new String(packet.getData()).trim());
-			
-			//obtenir nou missatge de teclat
-			System.out.print("MSG[enter per finalitzar]: ");
-			msg = sc.nextLine();
+        int serverPort = 7879;
+
+        Random random = new Random();
+        int clientPort = random.nextInt(5535) + 1024;
+
+        DatagramSocket socket = new DatagramSocket(clientPort);
+
+        System.out.print("MSG[enter per finalitzar]: ");
+        String msg = sc.nextLine();
+        while (!msg.isEmpty()) {
+            //enviar missatge a servidor
+            byte[] bytesOUT = msg.getBytes();
+            DatagramPacket outPacket = new DatagramPacket(bytesOUT, bytesOUT.length, serverAddress, serverPort);
+            socket.send(outPacket);
+            System.out.println(socket.getPort());
+
+            //rebre echo del servidor
+            byte[] buffer = new byte[1024];
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+            socket.receive(packet);
+            System.out.println(new String(packet.getData()).trim());
+
+            //obtenir nou missatge de teclat
+            System.out.print("MSG[enter per finalitzar]: ");
+            msg = sc.nextLine();
         }
         socket.close();
     }
 
     private static void crearServidorTCP() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+//          Jugador jugadorServer = new Jugador(INICIAR_PARTIDA, TORN_JUGADO, -1, );
+//                        FrameJoc jocNou = new FrameJoc();
     }
 
     private static void crearClientTCP() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-               
-		         
 
     }
 
