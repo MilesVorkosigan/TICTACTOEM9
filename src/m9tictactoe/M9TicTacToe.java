@@ -40,19 +40,10 @@ public class M9TicTacToe {
             } else {
                 System.out.println("Error, Has de seleccionar 1,2,3 opcions");
             }
-
+            sc.close();
         }
-
-    }
-
-    private static void crearServidorTCP() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    private static void crearClientTCP() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-                Scanner teclat = new Scanner(System.in);
-		            InetAddress serverAddress = InetAddress.getByName("127.0.0.1");
+        //UDP Clie
+        InetAddress serverAddress = InetAddress.getByName("127.0.0.1");
 		int serverPort = 7879;
 		
                 Random random = new Random();
@@ -61,7 +52,7 @@ public class M9TicTacToe {
 		DatagramSocket socket = new DatagramSocket(clientPort);
 		
 		System.out.print("MSG[enter per finalitzar]: ");
-		String msg = teclat.nextLine();
+		String msg = sc.nextLine();
 		while(!msg.isEmpty()) {
 			//enviar missatge a servidor
 			byte[] bytesOUT = msg.getBytes();
@@ -78,8 +69,19 @@ public class M9TicTacToe {
 			
 			//obtenir nou missatge de teclat
 			System.out.print("MSG[enter per finalitzar]: ");
-			msg = teclat.nextLine();
+			msg = sc.nextLine();
         }
+        socket.close();
+    }
+
+    private static void crearServidorTCP() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    private static void crearClientTCP() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+               
+		         
 
     }
 
