@@ -1,83 +1,142 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package model;
 
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.Queue;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ServidorCentral {
-    private static final int UDP_PORT = 7879;
-    private static Queue<String> partidaQueue = new ConcurrentLinkedQueue<>();
-    private static ConcurrentHashMap<String, String> partides = new ConcurrentHashMap<>();
 
-    public static void main(String[] args) {
-        DatagramSocket udpSocket = null;
+//	public static void main(String[] args) throws SocketException {
+//		int port = 7879;
+//                Queue<Partida> colaPartidas = new ConcurrentLinkedQueue<>();
+//		DatagramSocket socket = new DatagramSocket(port);
+//		System.out.printf("Escoltant al port %d...",port);
+//		
+//		while(true) {
+//			byte[] buffer = new byte[1024];
+//			DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+//			System.out.println("Esperant un nou paquet...");
+//			try {
+//				//missatge del client
+//				socket.receive(packet);
+//				String msg = new String(packet.getData()).trim();
+//				String address = packet.getAddress().getHostAddress();
+//				System.out.printf("%s --> %s\n",address, msg);
+//				
+//				//resposta echo
+//				msg = "ECHO: "+msg;
+//				System.out.println(msg);
+//				byte[] bytesOUT = msg.getBytes();
+//				System.out.println(packet.getSocketAddress().toString());
+//				DatagramPacket outPacket = new DatagramPacket(bytesOUT, bytesOUT.length, packet.getSocketAddress());
+//				socket.send(outPacket);
+//				
+//				
+//			} catch (IOException e) {
+//				System.out.println("Error: "+e.getMessage());
+//			}
+//		}
+//	}
+    
+    private static final int PUERTO_ESCUCHA = 7879;
+    private static final Queue<Partida> colaPartidas = new ConcurrentLinkedQueue<>();
 
-        try {
-            udpSocket = new DatagramSocket(UDP_PORT);
-            System.out.println("Servidor central en funcionament.");
+    public static void main(String[] args) throws SocketException {
+        DatagramSocket socket = new DatagramSocket(PUERTO_ESCUCHA);
+        System.out.printf("Escoltant al port %d...\n", PUERTO_ESCUCHA);
 
-            while (true) {
+        while (true) {
+            try {
                 byte[] buffer = new byte[1024];
-                DatagramPacket request = new DatagramPacket(buffer, buffer.length);
-                udpSocket.receive(request);
+                DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+                socket.receive(packet);
 
-                String data = new String(request.getData(), 0, request.getLength());
-                InetAddress clientAddress = request.getAddress();
-                int clientPort = request.getPort();
+                String mensaje = new String(packet.getData()).trim();
+                String[] partes = mensaje.split(" ");
 
-                String response = processRequest(data, clientAddress, clientPort);
-                DatagramPacket reply = new DatagramPacket(response.getBytes(), response.length(), clientAddress, clientPort);
-                udpSocket.send(reply);
+                if (partes.length == 2 && partes[0].equals("CREAR")) {
+                    // Mensaje de creación de partida
+                    int portJuego = Integer.parseInt(partes[1]);
+                    Partida nuevaPartida = new Partida(packet.getAddress().getHostAddress(), portJuego);
+                    System.out.println("intento crear partida");
+
+                    if (registrarPartida(nuevaPartida)) {
+                        System.out.println("envio el ok crear partida");
+                        enviarRespuesta(socket, packet.getAddress().getHostAddress(), packet.getPort(), "OK");
+                    } else {
+                        System.out.println("envio error partida existente");
+                        enviarRespuesta(socket, packet.getAddress().getHostAddress(), packet.getPort(), "ERROR Partida ya registrada");
+                    }
+
+                } else if (partes.length == 1 && partes[0].equals("UNIR-ME")) {
+                    // Mensaje de unirse a una partida
+                    Partida partida = obtenerPartida();
+                    if (partida != null) {
+                        System.out.println("envio ok unirse a partida");
+                        enviarRespuesta(socket, packet.getAddress().getHostAddress(), packet.getPort(), "OK");
+                    } else {
+                        System.out.println("envio no hay partidas disponibles, a esperar...");
+                        // No hay partidas disponibles, esperar...
+                        // (Puedes implementar una lógica para gestionar la espera)
+                    }
+                }
+            } catch (IOException e) {
+                System.out.println("Error: " + e.getMessage());
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (udpSocket != null && !udpSocket.isClosed()) {
-                udpSocket.close();
-            }
         }
     }
 
-    private static String processRequest(String data, InetAddress clientAddress, int clientPort) {
-        String[] parts = data.split(" ");
-        String clientIP = clientAddress.getHostAddress();
-
-        if (parts[0].equals("CREAR")) {
-            String port_joc = parts[1];
-            int portJoc = Integer.parseInt(port_joc);
-            return crearPartida(clientIP, portJoc);
-        } else if (parts[0].equals("UNIR-ME")) {
-            return unirSeAPartida(clientIP);
-        } else {
-            return "ERROR Comanda no vàlida";
+    private static synchronized boolean registrarPartida(Partida nuevaPartida) {
+    // Verificar si ya hay una partida registrada con la misma IP
+    for (Partida partida : colaPartidas) {
+        if (partida.getIp().equals(nuevaPartida.getIp())) {
+            return false; // Ya hay una partida registrada con la misma IP
         }
     }
 
-    private static String crearPartida(String clientIP, int portJoc) {
-        String key = clientIP + "::" + portJoc;
-
-        if (!partides.containsKey(key)) {
-            partidaQueue.add(key);
-            partides.put(key, null);
-            return "OK";
-        } else {
-            return "ERROR Ja hi ha una partida registrada amb aquesta IP i port";
-        }
+    // Si no hay una partida registrada con la misma IP, la registramos
+    return colaPartidas.add(nuevaPartida);
     }
 
-    private static String unirSeAPartida(String clientIP) {
-        if (!partidaQueue.isEmpty()) {
-            String partidaKey = partidaQueue.poll();
-            partides.put(partidaKey, clientIP);
-            return partidaKey;
-        } else {
-            return "Esperant a que hi hagi partides disponibles.";
-        }
+    private static Partida obtenerPartida() {
+        Partida partida = colaPartidas.poll(); // Utiliza el método poll que es atómico
+        return partida;
+    }
+
+//    private static void enviarRespuesta(DatagramSocket socket, String ip, int port, String mensaje) throws IOException {
+//        String respuesta = ip + "::" + port;
+//        byte[] bytesOUT = respuesta.getBytes();
+//        DatagramPacket outPacket = new DatagramPacket(bytesOUT, bytesOUT.length, socket.getInetAddress(), port);
+//        socket.send(outPacket);
+//    }
+    
+    private static void enviarRespuesta(DatagramSocket socket, String ip, int port, String mensaje) {
+    try {
+        //resposta echo
+//	msg = "ECHO: "+msg;
+//	System.out.println(msg);
+//	byte[] bytesOUT = msg.getBytes();
+//	System.out.println(packet.getSocketAddress().toString());
+//	DatagramPacket outPacket = new DatagramPacket(bytesOUT, bytesOUT.length, packet.getSocketAddress());
+//	socket.send(outPacket);
+        String respuesta = mensaje;
+        byte[] bytesOUT = respuesta.getBytes();
+        System.out.println("Valor de ip: " + ip);
+        System.out.println("Valor de port: " + port);
+        InetAddress address = InetAddress.getByName(ip);
+        DatagramPacket outPacket = new DatagramPacket(bytesOUT, bytesOUT.length, address, port);
+        socket.send(outPacket);
+        System.out.println("He enviado el datagrama");
+    } catch (IOException e) {
+        System.out.println("Error al enviar respuesta: " + e.getMessage());
+    }
     }
 }
+
+
 
