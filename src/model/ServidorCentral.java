@@ -67,7 +67,7 @@ public class ServidorCentral {
 
                     if (registrarPartida(nuevaPartida)) {
                         System.out.println("envio el ok crear partida");
-                        enviarRespuesta(socket, packet.getAddress().getHostAddress(), packet.getPort(), "OK");
+                        enviarRespuesta(socket, packet.getAddress().getHostAddress(), packet.getPort(), "OK " + nuevaPartida.getPort());
                     } else {
                         System.out.println("envio error partida existente");
                         enviarRespuesta(socket, packet.getAddress().getHostAddress(), packet.getPort(), "ERROR Partida ya registrada");
@@ -78,7 +78,7 @@ public class ServidorCentral {
                     Partida partida = obtenerPartida();
                     if (partida != null) {
                         System.out.println("envio ok unirse a partida");
-                        enviarRespuesta(socket, packet.getAddress().getHostAddress(), packet.getPort(), "OK");
+                        enviarRespuesta(socket, packet.getAddress().getHostAddress(), packet.getPort(), "OK " + partida.getPort());
                     } else {
                         System.out.println("envio no hay partidas disponibles, a esperar...");
                         // No hay partidas disponibles, esperar...
