@@ -10,38 +10,6 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ServidorCentral {
-
-//	public static void main(String[] args) throws SocketException {
-//		int port = 7879;
-//                Queue<Partida> colaPartidas = new ConcurrentLinkedQueue<>();
-//		DatagramSocket socket = new DatagramSocket(port);
-//		System.out.printf("Escoltant al port %d...",port);
-//		
-//		while(true) {
-//			byte[] buffer = new byte[1024];
-//			DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-//			System.out.println("Esperant un nou paquet...");
-//			try {
-//				//missatge del client
-//				socket.receive(packet);
-//				String msg = new String(packet.getData()).trim();
-//				String address = packet.getAddress().getHostAddress();
-//				System.out.printf("%s --> %s\n",address, msg);
-//				
-//				//resposta echo
-//				msg = "ECHO: "+msg;
-//				System.out.println(msg);
-//				byte[] bytesOUT = msg.getBytes();
-//				System.out.println(packet.getSocketAddress().toString());
-//				DatagramPacket outPacket = new DatagramPacket(bytesOUT, bytesOUT.length, packet.getSocketAddress());
-//				socket.send(outPacket);
-//				
-//				
-//			} catch (IOException e) {
-//				System.out.println("Error: "+e.getMessage());
-//			}
-//		}
-//	}
     
     private static final int PUERTO_ESCUCHA = 7879;
     private static final Queue<Partida> colaPartidas = new ConcurrentLinkedQueue<>();
@@ -81,12 +49,13 @@ public class ServidorCentral {
                         enviarRespuesta(socket, packet.getAddress().getHostAddress(), packet.getPort(), "OK " + partida.getPort());
                     } else {
                         System.out.println("envio no hay partidas disponibles, a esperar...");
-                        // No hay partidas disponibles, esperar...
-                        // (Puedes implementar una lógica para gestionar la espera)
+                        enviarRespuesta(socket, packet.getAddress().getHostAddress(), packet.getPort(), "no hay partidas disponibles, a esperar...");
+                        // No hay partidas disponibles, hay que esperar
                     }
                 }
             } catch (IOException e) {
                 System.out.println("Error: " + e.getMessage());
+                
             }
         }
     }
@@ -107,23 +76,9 @@ public class ServidorCentral {
         Partida partida = colaPartidas.poll(); // Utiliza el método poll que es atómico
         return partida;
     }
-
-//    private static void enviarRespuesta(DatagramSocket socket, String ip, int port, String mensaje) throws IOException {
-//        String respuesta = ip + "::" + port;
-//        byte[] bytesOUT = respuesta.getBytes();
-//        DatagramPacket outPacket = new DatagramPacket(bytesOUT, bytesOUT.length, socket.getInetAddress(), port);
-//        socket.send(outPacket);
-//    }
     
     private static void enviarRespuesta(DatagramSocket socket, String ip, int port, String mensaje) {
     try {
-        //resposta echo
-//	msg = "ECHO: "+msg;
-//	System.out.println(msg);
-//	byte[] bytesOUT = msg.getBytes();
-//	System.out.println(packet.getSocketAddress().toString());
-//	DatagramPacket outPacket = new DatagramPacket(bytesOUT, bytesOUT.length, packet.getSocketAddress());
-//	socket.send(outPacket);
         String respuesta = mensaje;
         byte[] bytesOUT = respuesta.getBytes();
         System.out.println("Valor de ip: " + ip);

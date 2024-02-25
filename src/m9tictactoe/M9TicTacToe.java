@@ -43,7 +43,6 @@ private final boolean SEGON_TORN=false;
                         
                       
                         crearServidorTCP(socket, serverPort, serverAddress);
-
                     }
                     case 2 ->
                         crearClientTCP(socket, serverPort, serverAddress);
@@ -56,30 +55,8 @@ private final boolean SEGON_TORN=false;
             } else {
                 System.out.println("Error, Has de seleccionar 1,2,3 opcions");
             }
-            sc.close();
         }
-        //UDP Clie
-
-        System.out.print("MSG[enter per finalitzar]: ");
-        String msg = sc.nextLine();
-        while (!msg.isEmpty()) {
-            //enviar missatge a servidor
-            byte[] bytesOUT = msg.getBytes();
-            DatagramPacket outPacket = new DatagramPacket(bytesOUT, bytesOUT.length, serverAddress, serverPort);
-            socket.send(outPacket);
-            System.out.println(socket.getPort());
-
-            //rebre echo del servidor
-            byte[] buffer = new byte[1024];
-            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-            socket.receive(packet);
-            System.out.println(new String(packet.getData()).trim());
-
-            //obtenir nou missatge de teclat
-            System.out.print("MSG[enter per finalitzar]: ");
-            msg = sc.nextLine();
-        }
-        socket.close();
+        sc.close();
     }
 
     private static void crearServidorTCP(DatagramSocket socket, int serverPort, InetAddress serverAddress) throws IOException {
