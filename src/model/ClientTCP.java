@@ -29,11 +29,7 @@ public class ClientTCP implements Runnable {
     @Override
 
     public void run() {
-        Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Si us plau escriu el teu nom");
-        name = scanner.nextLine();
-        scanner.close();
         try {
 
             sock = new Socket(servidorIP, port);
@@ -48,6 +44,10 @@ public class ClientTCP implements Runnable {
 
     private void saludar() {
         String salutacio;
+        try (Scanner scanner = new Scanner(System.in)) {
+            System.out.println("Si us plau escriu el teu nom");
+            name = scanner.nextLine();
+        }
         try {
             salutacio = in.readUTF();
             System.out.println(salutacio);
@@ -60,14 +60,21 @@ public class ClientTCP implements Runnable {
 
     public int jugadaRebuda() {
         try {
-            return in.readInt();
+            int jugada = -1; 
+            
+            while (jugada == -1) { 
+                System.out.println("test");
+                jugada = in.readInt(); 
+            }
+            return jugada;
         } catch (IOException ex) {
             Logger.getLogger(ClientTCP.class.getName()).log(Level.SEVERE, null, ex);
             return -10;
         }
 
     }
-    public void jugadaResposta(int jugadaSeleccionada){
+
+    public void jugadaResposta(int jugadaSeleccionada) {
         try {
             out.writeInt(jugadaSeleccionada);
         } catch (IOException ex) {

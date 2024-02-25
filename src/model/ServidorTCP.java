@@ -45,21 +45,21 @@ public class ServidorTCP implements Runnable {
     @Override
     public void run() {
 
-        ///Guio que volem Saludar esperar
-        System.out.println("Escriu el teu nom Usuari");
-        Scanner scanner = new Scanner(System.in);
-        name = scanner.nextLine();
-        scanner.close();
-        //crear port
+        // crear port
         // port = crearAleatoriamentPort();
-
         try {
             serverSc = new ServerSocket(port);
+            System.out.println("Servidor TCP escoltant " + serverSc);
+            while (true) {
+                System.out.println("Esperando conexión de cliente...");
+                sc = serverSc.accept();
+                System.out.println("Cliente conectado desde " + sc.getRemoteSocketAddress());
 
-            sc = serverSc.accept();
-            in = new DataInputStream(sc.getInputStream());
-            out = new DataOutputStream(sc.getOutputStream());
-            saludar();
+                // Manejar la conexión con el cliente
+                manejarConnexioClient();
+            }
+
+            
 
         } catch (IOException e) {
             System.out.println("Error de E/S: " + e.getMessage());
@@ -67,10 +67,23 @@ public class ServidorTCP implements Runnable {
 
     }
 
+    private void manejarConnexioClient() throws IOException {
+        in = new DataInputStream(sc.getInputStream());
+        out = new DataOutputStream(sc.getOutputStream());
+        saludar();
+    }
+
     private void saludar() throws IOException {
+        /// Guio que volem Saludar esperar
+        System.out.println("Escriu el teu nom Usuari");
+        Scanner scanner = new Scanner(System.in);
+        name = scanner.nextLine();
+        System.out.println(" Nom" + name);
+        scanner.close();
+
         System.out.println("Esperant la resposta del contrari");
         out.writeUTF("Hola em dic " + name + " preparat per jogar?");
-        System.out.println("" + in.readUTF());
+        System.out.println("Resposta : " + in.readUTF());
     }
 
     public int comunicantJugada(int seleccionadaJugada) throws IOException {
@@ -88,13 +101,13 @@ public class ServidorTCP implements Runnable {
 
     public void esPartidaAcabada(boolean partidaAcabada) {
         if (partidaAcabada) {
-          try {
-            despedir();
-        } catch (IOException ex) {
-            Logger.getLogger(ServidorTCP.class.getName()).log(Level.SEVERE, null, ex);
-        }  
+            try {
+                despedir();
+            } catch (IOException ex) {
+                Logger.getLogger(ServidorTCP.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
- 
+
     }
 
     private void tancarConexion() {

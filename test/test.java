@@ -16,18 +16,20 @@ public class test {
     public static void main(String[] args) {
         Jugador jugador = new Jugador(true, true, 0, "0");
         FrameJoc joc = new FrameJoc(jugador);
-        ServidorTCP server = new ServidorTCP(8888);
+        ServidorTCP server = new ServidorTCP(3000);
         server.run();
         
-        while(!joc.isFinalPartida()){
-            
+        
+
+        while (!joc.isFinalPartida()) {
+
             if (joc.hanEscullitJugada()) {
                 try {
                     server.comunicantJugada(joc.enviarJugadaSeleccionada());
                 } catch (IOException ex) {
                     Logger.getLogger(test.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
+
             }
         }
         try {
@@ -35,7 +37,6 @@ public class test {
         } catch (IOException ex) {
             Logger.getLogger(test.class.getName()).log(Level.SEVERE, null, ex);
         }
-
 
     }
 }

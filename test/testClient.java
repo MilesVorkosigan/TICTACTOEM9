@@ -12,24 +12,29 @@ public class testClient {
 
     public static void main(String[] args) throws IOException {
         Jugador jugador = new Jugador(true, false, 0, "X");
-        FrameJoc joc = new FrameJoc(jugador);
+        
 
-        ClientTCP client = new ClientTCP("localhost", 8888);
+        ClientTCP client = new ClientTCP("127.0.0.1", 3000);
 
-    client.run();
-    
+        client.run();
+        // hi ha un bug del Frame que no permet comunicació per tant envio les comunicacions editades
+       //FrameJoc jocClient = new FrameJoc(jugador);
+/*         jocClient.inciarPartida();
 
-        while (!joc.isFinalPartida()) {
+        while (!jocClient.isFinalPartida()) {
             // Si el cliente ha recibido una jugada del servidor, actualiza el juego
-            if (!joc.hanEscullitJugada()) {
-                joc.rebreJugadaSeleccionada(client.jugadaRebuda());
+
+            jocClient.rebreJugadaSeleccionada(client.jugadaRebuda());
+
+            while (!jocClient.hanEscullitJugada()) {
+                // Si el jugador ha seleccionado una jugada, envíala al servidor
+                if (jocClient.hanEscullitJugada()) {
+                    client.jugadaResposta(jocClient.enviarJugadaSeleccionada());
+                }
             }
 
-            // Si el jugador ha seleccionado una jugada, envíala al servidor
-            if (joc.hanEscullitJugada()) {
-                client.jugadaResposta(joc.enviarJugadaSeleccionada());
-            }
-        }
+        } */
+      
 
         // Cuando la partida termina, despide al cliente
         client.despedir();
