@@ -52,6 +52,7 @@ public class ClientTCP implements Runnable {
             salutacio = in.readUTF();
             System.out.println(salutacio);
             out.writeUTF("Hola em dic " + name + " espero que tinguis un mal dia");
+            
         } catch (IOException ex) {
             Logger.getLogger(ClientTCP.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -85,7 +86,7 @@ public class ClientTCP implements Runnable {
     public void despedir() throws IOException {
         String despedida = in.readUTF();
         System.out.println(despedida);
-        out.writeUTF("Bon joc");
+        out.writeUTF("Bon joc Servidor");
 
         tancarConexion();
     }

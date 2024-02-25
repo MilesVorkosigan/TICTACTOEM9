@@ -50,16 +50,14 @@ public class ServidorTCP implements Runnable {
         try {
             serverSc = new ServerSocket(port);
             System.out.println("Servidor TCP escoltant " + serverSc);
-            while (true) {
-                System.out.println("Esperando conexión de cliente...");
-                sc = serverSc.accept();
-                System.out.println("Cliente conectado desde " + sc.getRemoteSocketAddress());
 
-                // Manejar la conexión con el cliente
-                manejarConnexioClient();
-            }
+            System.out.println("Esperando conexión de cliente...");
+            sc = serverSc.accept();
+            System.out.println("Cliente conectado desde " + sc.getRemoteSocketAddress());
 
-            
+            // Manejar la conexión con el cliente
+            manejarConnexioClient();
+            saludar();
 
         } catch (IOException e) {
             System.out.println("Error de E/S: " + e.getMessage());
@@ -70,10 +68,10 @@ public class ServidorTCP implements Runnable {
     private void manejarConnexioClient() throws IOException {
         in = new DataInputStream(sc.getInputStream());
         out = new DataOutputStream(sc.getOutputStream());
-        saludar();
+
     }
 
-    private void saludar() throws IOException {
+    public void saludar() throws IOException {
         /// Guio que volem Saludar esperar
         System.out.println("Escriu el teu nom Usuari");
         Scanner scanner = new Scanner(System.in);
@@ -82,7 +80,7 @@ public class ServidorTCP implements Runnable {
         scanner.close();
 
         System.out.println("Esperant la resposta del contrari");
-        out.writeUTF("Hola em dic " + name + " preparat per jogar?");
+        out.writeUTF("Hola em dic " + name + " preparat per jugar?");
         System.out.println("Resposta : " + in.readUTF());
     }
 
@@ -93,7 +91,7 @@ public class ServidorTCP implements Runnable {
     }
 
     public void despedir() throws IOException {
-        out.writeUTF("Bon joc");
+        out.writeUTF("Bon joc Client");
         String despedida = in.readUTF();
         System.out.println(despedida);
         tancarConexion();
