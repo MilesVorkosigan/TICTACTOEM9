@@ -5,8 +5,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Random;
+
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -16,10 +18,11 @@ public class ServidorTCP implements Runnable {
 
     private int port;
     private ServerSocket serverSc;
+    private Socket sc;
+    private DataInputStream in;
+    private DataOutputStream out;
 
-    private boolean running;
     private String name;
-    private String nameEnemy;
 
     public ServidorTCP(int port) {
 
@@ -34,14 +37,6 @@ public class ServidorTCP implements Runnable {
         this.port = port;
     }
 
-    public boolean isRunning() {
-        return running;
-    }
-
-    public void setRunning(boolean running) {
-        this.running = running;
-    }
-
     public ServidorTCP(int port, ServerSocket ServerSocket) {
         this.port = port;
         this.serverSc = ServerSocket;
@@ -49,43 +44,76 @@ public class ServidorTCP implements Runnable {
 
     @Override
     public void run() {
-        DataInputStream in;
-        DataOutputStream out;
+
+        ///Guio que volem Saludar esperar
         System.out.println("Escriu el teu nom Usuari");
         Scanner scanner = new Scanner(System.in);
         name = scanner.nextLine();
         scanner.close();
         //crear port
         // port = crearAleatoriamentPort();
-        port = 8888;
-        int jugada = 15;
+
         try {
             serverSc = new ServerSocket(port);
-            Socket sc;
+
             sc = serverSc.accept();
             in = new DataInputStream(sc.getInputStream());
             out = new DataOutputStream(sc.getOutputStream());
-            out.writeUTF("Hola el meu nom és " + name + ".");
-
-            nameEnemy = in.readUTF();
-            System.out.println("Creada connexió amb " + nameEnemy);
-            out.writeUTF("Molt bé " + nameEnemy + ", avui tindras un mal dia");
-            while (true) {
-                System.out.println("linea" + jugada);
-                break;
-
-            }
-            sc.close();
+            saludar();
 
         } catch (IOException e) {
+            System.out.println("Error de E/S: " + e.getMessage());
         }
 
     }
 
-    private int crearAleatoriamentPort() {
-        Random random = new Random();
-        // El rang dels ports vàlits es de 0 a 65535
-        return random.nextInt(65536);
+    private void saludar() throws IOException {
+        System.out.println("Esperant la resposta del contrari");
+        out.writeUTF("Hola em dic " + name + " preparat per jogar?");
+        System.out.println("" + in.readUTF());
+    }
+
+    public int comunicantJugada(int seleccionadaJugada) throws IOException {
+        out.writeInt(seleccionadaJugada);
+        int jugadaRebuda = in.readInt();
+        return jugadaRebuda;
+    }
+
+    public void despedir() throws IOException {
+        out.writeUTF("Bon joc");
+        String despedida = in.readUTF();
+        System.out.println(despedida);
+        tancarConexion();
+    }
+
+    public void esPartidaAcabada(boolean partidaAcabada) {
+        if (partidaAcabada) {
+          try {
+            despedir();
+        } catch (IOException ex) {
+            Logger.getLogger(ServidorTCP.class.getName()).log(Level.SEVERE, null, ex);
+        }  
+        }
+ 
+    }
+
+    private void tancarConexion() {
+        try {
+            if (in != null) {
+                in.close();
+            }
+            if (out != null) {
+                out.close();
+            }
+            if (sc != null) {
+                sc.close();
+            }
+            if (serverSc != null) {
+                serverSc.close();
+            }
+        } catch (IOException e) {
+            System.out.println("Error al cerrar la conexión: " + e.getMessage());
+        }
     }
 
 }
