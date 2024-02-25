@@ -21,14 +21,12 @@ public class ServidorTCP implements Runnable {
     private Socket sc;
     private DataInputStream in;
     private DataOutputStream out;
-    private boolean partidaAcabada;
 
     private String name;
 
     public ServidorTCP(int port) {
 
         this.port = port;
-        this.partidaAcabada = false;
     }
 
     public int getPort() {
@@ -75,20 +73,20 @@ public class ServidorTCP implements Runnable {
         System.out.println("" + in.readUTF());
     }
 
-    private int comunicantJugada(int seleccionadaJugada) throws IOException {
+    public int comunicantJugada(int seleccionadaJugada) throws IOException {
         out.writeInt(seleccionadaJugada);
         int jugadaRebuda = in.readInt();
         return jugadaRebuda;
     }
 
-    private void despedir() throws IOException {
+    public void despedir() throws IOException {
         out.writeUTF("Bon joc");
         String despedida = in.readUTF();
         System.out.println(despedida);
         tancarConexion();
     }
 
-    private void esPartidaAcabada(boolean partidaAcabada) {
+    public void esPartidaAcabada(boolean partidaAcabada) {
         if (partidaAcabada) {
           try {
             despedir();
